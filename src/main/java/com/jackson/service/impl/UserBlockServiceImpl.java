@@ -97,6 +97,6 @@ public class UserBlockServiceImpl extends ServiceImpl<UserBlockMapper, UserBlock
         List<User> blockUserList = userService.query().in("id", userBlockIdList).list();
         List<UserHolder> userHolderList = blockUserList.stream()
                 .map(blockUser -> BeanUtil.copyProperties(blockUser, UserHolder.class)).toList();
-        return Result.success(userBlockIdList);
+        return Result.success(userHolderList);
     }
 }
