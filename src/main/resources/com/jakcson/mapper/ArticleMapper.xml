@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jackson.mapper.ArticleMapper">
+    <select id="getArticlesWithPaging" resultType="com.jackson.entity.Article">
+        select * from tb_article
+        <where>
+            <if test="title != null">
+                title like concat('%',#{title},'%')
+            </if>
+            <if test="userBlockIdList != null">
+                 and user_id not in
+                <foreach collection="userBlockIdList" item="userBlock" open="(" separator="," close=")">
+                    #{userBlock}
+                </foreach>
+            </if>
+        </where>
+        order by create_time desc limit #{start}, #{pageSize}
+    </select>
+</mapper>
