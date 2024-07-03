@@ -43,6 +43,7 @@ public class ArticleReportServiceImpl extends ServiceImpl<ArticleReportMapper, A
         this.save(new ArticleReport(userId, articleId));
         // 1.1.2.2 将举报数据缓存到redis中
         stringRedisTemplate.opsForZSet().add(userReportKey, articleId.toString(), System.currentTimeMillis());
+        log.info("举报文章成功:{}", articleId);
         return Result.success();
     }
 }

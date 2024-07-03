@@ -4,6 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jackson.constant.BaseConstant;
 import com.jackson.constant.RedisConstant;
@@ -20,6 +22,7 @@ import com.jackson.dto.UserPasswordDTO;
 import com.jackson.mapper.UserMapper;
 import com.jackson.entity.Result;
 import com.jackson.service.UserService;
+import com.jackson.utils.UserHolder;
 import com.jackson.vo.UserVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -125,6 +128,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .updateTime(LocalDateTime.now())
                 .build();
         this.save(user);
+        return Result.success();
+    }
+
+    /**
+     * 用户修改个人信息功能实现
+     *
+     * @param userInfo
+     * @return
+     */
+    @Override
+    public Result updateUserInfo(UserInfo userInfo) {
+        UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
+        Long userId = UserHolder.getUser().getId();
+        userUpdateWrapper.eq("id", userId);
+        String avatar = userInfo.getAvatar();
+        userUpdateWrapper.set(avatar != null && !avatar.isEmpty(), "avatar", avatar);
+        String email = userInfo.getEmail();
+        userUpdateWrapper.set(email != null && !email.isEmpty(), "email", email);
+        String username = userInfo.getUsername();
+        userUpdateWrapper.set(username != null && !username.isEmpty(), "username", username);
+        LocalDateTime birthday = userInfo.getBirthday();
+        userUpdateWrapper.set(birthday != null, "birthday", birthday);
+        userUpdateWrapper.set("update_time", LocalDateTime.now());
+        this.update(userUpdateWrapper);
+        log.info("更新个人信息成功:{}", userId);
         return Result.success();
     }
 }
