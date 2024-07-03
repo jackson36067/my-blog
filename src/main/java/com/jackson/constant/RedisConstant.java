@@ -10,4 +10,5 @@ public class RedisConstant {
     public static final String FOLLOW_INBOX_PREFIX = "follow:inbox:"; // 粉丝收件箱key前缀
     public static final String TEMPORARY_FOLLOW_INBOX_PREFIX = "temporary:inbox:"; // 当用户查看关注者推送的文章时用它把文章保存起来,然后把收件箱清空
     public static final String BLOCK_KEY_PREFIX = "user:block:"; // 用户拉黑缓存key前缀
+    public static final String REPORT_KEY_PREFIX = "user:report:"; // 用户举报缓存key前缀
 }
