@@ -1,6 +1,7 @@
 package com.jackson.constant;
 
 public class RedisConstant {
+    public static final String USERINFO_KEY = "user:info:";
     public static final String LOGIN_TOKEN_PREFIX = "login:token:";
     public static final Long TOKEN_EXPIRE_TIME = 36000L;
     public static final String LOGIN_CODE_KEY = "login:code:";

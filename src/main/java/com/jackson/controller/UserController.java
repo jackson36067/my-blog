@@ -10,7 +10,7 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/my-blog")
+@RequestMapping("/user/my-blog")
 public class UserController {
 
     @Resource
@@ -28,7 +28,7 @@ public class UserController {
     }
 
     /**
-     * 使用验证码登录/注册
+     * 使用验证码登录
      *
      * @param userCodeDTO
      * @return
@@ -43,7 +43,12 @@ public class UserController {
         return userService.sendCode(email);
     }
 
-    @PostMapping
+    /**
+     * 用户注册
+     * @param userRegisterDTO
+     * @return
+     */
+    @PostMapping("/register")
     public Result register(@RequestBody UserRegisterDTO userRegisterDTO) {
         return userService.register(userRegisterDTO);
     }

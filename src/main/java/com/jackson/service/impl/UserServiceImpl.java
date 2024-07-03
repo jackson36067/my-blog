@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jackson.constant.BaseConstant;
@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,6 +59,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
 
+    /**
+     * 通过密码登录
+     *
+     * @param userPasswordDTO
+     * @return
+     */
     @Override
     public Result loginByPassword(UserPasswordDTO userPasswordDTO) {
         String userName = userPasswordDTO.getUsername();
@@ -77,11 +84,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return Result.success(userVO);
     }
 
+    /**
+     * 使用验证码登录
+     *
+     * @param userCodeDTO
+     * @return
+     */
     @Override
     public Result loginByCode(UserCodeDTO userCodeDTO) {
         User user = this.query().eq("email", userCodeDTO.getEmail()).one();
         if (user == null) {
-            throw new UserNotFoundException("请先注册");
+            throw new UserNotFoundException(BaseConstant.USER_NOT_FOUND);
         }
         if (!userCodeDTO.getCode().equals(stringRedisTemplate.opsForValue().get(RedisConstant.LOGIN_CODE_KEY + userCodeDTO.getEmail()))) {
             throw new CodeErrorException(BaseConstant.CODE_ERROR);
@@ -95,21 +108,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return Result.success(userVO);
     }
 
+    /**
+     * 发送验证码
+     *
+     * @param email
+     * @return
+     */
     @Override
     public Result sendCode(String email) {
-        sendCodeAndCacheCode(email);
-        log.info("发送验证码成功");
-        return Result.success();
-    }
-
-    private void sendCodeAndCacheCode(String email) {
         String code = RandomUtil.randomNumbers(6);
         mailManagement.sendCode(email, code);
         String codeKey = RedisConstant.LOGIN_CODE_KEY + email;
         stringRedisTemplate.opsForValue()
                 .set(codeKey, code, RedisConstant.CODE_EXPIRE_TIME, TimeUnit.MINUTES);
+        log.info("发送验证码成功");
+        return Result.success();
     }
 
+    /**
+     * 用户注册
+     *
+     * @param userRegisterDTO
+     * @return
+     */
+    // TODO 删除发送验证码功能 -> 校验验证码功能
     @Override
     public Result register(UserRegisterDTO userRegisterDTO) {
         String email = userRegisterDTO.getEmail();
@@ -117,17 +139,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (user != null) {
             throw new UserExistException(BaseConstant.USER_EXIST);
         }
-        sendCodeAndCacheCode(email);
+        // 校验验证码是否正确
+        if (!userRegisterDTO.getCode().equals(stringRedisTemplate.opsForValue().get(RedisConstant.LOGIN_CODE_KEY + userRegisterDTO.getEmail()))) {
+            throw new CodeErrorException(BaseConstant.CODE_ERROR);
+        }
         user = User.builder()
                 .username(userRegisterDTO.getUserName())
                 .avatar(null)
                 .email(email)
                 .password(userRegisterDTO.getPassword())
-                .birthday(userRegisterDTO.getBirthday())
+                .birthday(null)
                 .createTime(LocalDateTime.now())
                 .updateTime(LocalDateTime.now())
                 .build();
         this.save(user);
+        // 将用户信息转换为userInfo保存到redis
+        UserInfo userInfo = BeanUtil.copyProperties(user, UserInfo.class);
+        // 将所有用户的数据保存到一个key中
+        stringRedisTemplate.opsForZSet().add(RedisConstant.USERINFO_KEY, JSONUtil.toJsonStr(userInfo), System.currentTimeMillis());
         return Result.success();
     }
 
@@ -148,7 +177,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userUpdateWrapper.set(email != null && !email.isEmpty(), "email", email);
         String username = userInfo.getUsername();
         userUpdateWrapper.set(username != null && !username.isEmpty(), "username", username);
-        LocalDateTime birthday = userInfo.getBirthday();
+        LocalDate birthday = userInfo.getBirthday();
         userUpdateWrapper.set(birthday != null, "birthday", birthday);
         userUpdateWrapper.set("update_time", LocalDateTime.now());
         this.update(userUpdateWrapper);
