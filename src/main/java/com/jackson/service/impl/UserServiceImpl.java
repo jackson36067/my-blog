@@ -5,6 +5,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jackson.constant.BaseConstant;
@@ -182,6 +183,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userUpdateWrapper.set("update_time", LocalDateTime.now());
         this.update(userUpdateWrapper);
         log.info("更新个人信息成功:{}", userId);
+        return Result.success();
+    }
+
+    /**
+     * 更改密码
+     *
+     * @param userPasswordDTO
+     */
+    @Override
+    public Result updatePassword(UserPasswordDTO userPasswordDTO) {
+        String username = userPasswordDTO.getUsername();
+        User user = this.query().eq("username", username).one();
+        if (user == null) {
+            throw new UserNotFoundException(BaseConstant.USER_NOT_FOUND);
+        }
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.set("password", userPasswordDTO.getPassword());
+        this.update(user, updateWrapper);
+        log.info("更新密码成功:{}", username);
         return Result.success();
     }
 }

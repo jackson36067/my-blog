@@ -45,6 +45,7 @@ public class UserController {
 
     /**
      * 用户注册
+     *
      * @param userRegisterDTO
      * @return
      */
@@ -55,11 +56,23 @@ public class UserController {
 
     /**
      * 用户修改个人信息功能实现
+     *
      * @param userInfo
      * @return
      */
     @PostMapping("/update/userInfo")
     public Result updateUserInfo(@RequestBody UserInfo userInfo) {
         return userService.updateUserInfo(userInfo);
+    }
+
+    /**
+     * 更改密码
+     *
+     * @param userPasswordDTO
+     * @return
+     */
+    @PostMapping("/update/password")
+    public Result updatePassword(@RequestBody UserPasswordDTO userPasswordDTO) {
+        return userService.updatePassword(userPasswordDTO);
     }
 }

@@ -16,4 +16,6 @@ public interface UserService {
     Result register(UserRegisterDTO userRegisterDTO);
 
     Result updateUserInfo(UserInfo userInfo);
+
+    Result updatePassword(UserPasswordDTO userPasswordDTO);
 }
