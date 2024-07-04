@@ -14,7 +14,6 @@ import com.jackson.exception.ArticleNotExistException;
 import com.jackson.mapper.ArticleMapper;
 import com.jackson.service.ArticleService;
 import com.jackson.utils.UserHolder;
-import com.jackson.vo.ArticleVO;
 import jodd.util.StringUtil;
 import com.jackson.vo.ArticlePageVO;
 import jakarta.annotation.Resource;
@@ -59,6 +58,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         article.setCreateTime(LocalDateTime.now());
         article.setUpdateTime(LocalDateTime.now());
         this.save(article);
+        // 以用户id为key,缓存起来他发布的文章id
+        stringRedisTemplate.opsForZSet().add(RedisConstant.USER_ARTICLE_INFO_KEY_PREFIX + userInfo, article.getId().toString(), System.currentTimeMillis());
         log.info("发布文章成功");
         return Result.success();
     }
@@ -164,7 +165,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     /**
-     * 用户主页信息展示
+     * 别的用户主页文章信息展示
      *
      * @param userId
      * @return
@@ -293,6 +294,25 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                     .likedUserList(likeUserList)
                     .build();
         }).toList();
+        return Result.success(articlePageVOS);
+    }
+
+    /**
+     * 获取自己发布的文章列表
+     *
+     * @return
+     */
+    @Override
+    public Result showOwnArticles() {
+        Long userId = UserHolder.getUser().getId();
+        String userArticleKey = RedisConstant.USER_ARTICLE_INFO_KEY_PREFIX + userId;
+        Set<String> userArticleIdStrSet = stringRedisTemplate.opsForZSet().range(userArticleKey, 0, -1);
+        if (userArticleIdStrSet == null) {
+            return Result.success(List.of());
+        }
+        List<Long> userArticleIdList = userArticleIdStrSet.stream().map(Long::valueOf).toList();
+        List<Article> articleList = this.query().in("id", userArticleIdList).list();
+        List<ArticlePageVO> articlePageVOS = getArticlePageVOS(articleList, false);
         return Result.success(articlePageVOS);
     }
 

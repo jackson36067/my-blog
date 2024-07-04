@@ -19,4 +19,6 @@ public interface ArticleService {
     Result getArticleDetailById(Long id);
 
     Result showLikes();
+
+    Result showOwnArticles();
 }

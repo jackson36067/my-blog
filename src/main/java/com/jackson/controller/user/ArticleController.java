@@ -85,6 +85,12 @@ public class ArticleController {
         return articleService.articleLikes(id);
     }
 
+    /**
+     * 展示文章详情
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("/getDetail/{id}")
     public Result getArticleDetailById(@PathVariable Long id) {
         return articleService.getArticleDetailById(id);
@@ -92,10 +98,20 @@ public class ArticleController {
 
     /**
      * 展示用户点赞列表
+     *
      * @return
      */
     @GetMapping("/show/like")
     public Result showLikes() {
         return articleService.showLikes();
+    }
+
+    /**
+     * 获取自己发布的文章列表
+     * @return
+     */
+    @GetMapping("/show/own")
+    public Result showOwnArticles() {
+        return articleService.showOwnArticles();
     }
 }
