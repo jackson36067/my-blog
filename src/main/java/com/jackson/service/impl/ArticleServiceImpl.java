@@ -59,25 +59,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         article.setCreateTime(LocalDateTime.now());
         article.setUpdateTime(LocalDateTime.now());
         this.save(article);
-        String followKey = RedisConstant.FOLLOW_KEY_PREFIX + userId;
-        // 获取用户的所有粉丝
-        Set<String> follows = stringRedisTemplate.opsForZSet().range(followKey, 0, -1);
-        // 将文章推送至每个粉丝的收件箱
-        if (follows != null) {
-            follows.forEach((String s) -> {
-                String followInboxKey = RedisConstant.FOLLOW_INBOX_PREFIX + s;
-                ArticleVO articleVO = ArticleVO.builder()
-                        .id(article.getId())
-                        .title(article.getTitle())
-                        .text(article.getText())
-                        .images(article.getImage())
-                        .createTime(article.getCreateTime())
-                        .avatar(userInfo.getAvatar())
-                        .username(userInfo.getUsername())
-                        .build();
-                stringRedisTemplate.opsForZSet().add(followInboxKey, JSONUtil.toJsonStr(articleVO), System.currentTimeMillis());
-            });
-        }
         log.info("发布文章成功");
         return Result.success();
     }
@@ -134,8 +115,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         int start = (page - 1) * pageSize;
         Long userId = UserHolder.getUser().getId();
         // 将拉黑的用户的文章舍去
-        List<UserBlock> userBlockList = userBlockService.query().eq("user_id", userId).list();
-        List<Long> userBlockIdList = userBlockList.stream().map(UserBlock::getUserBlockId).toList();
+        Set<String> userBlockIdStrSet = stringRedisTemplate.opsForZSet().range(RedisConstant.BLOCK_KEY_PREFIX + userId, 0, -1);
+        if (userBlockIdStrSet == null) {
+            return Result.success(List.of());
+        }
+        List<Long> userBlockIdList = userBlockIdStrSet.stream().map(Long::valueOf).toList();
         List<Article> articlesList = articleMapper.getArticlesWithPaging(start, pageSize, title, userBlockIdList);
         List<ArticlePageVO> articlePageVOList = getArticlePageVOS(articlesList, false);
         return Result.success(articlePageVOList);

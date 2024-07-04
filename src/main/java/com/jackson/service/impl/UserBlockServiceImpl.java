@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jackson.constant.RedisConstant;
+import com.jackson.dto.UserInfo;
 import com.jackson.entity.Follow;
 import com.jackson.entity.Result;
 import com.jackson.entity.User;
@@ -26,8 +27,6 @@ public class UserBlockServiceImpl extends ServiceImpl<UserBlockMapper, UserBlock
     @Resource(name = "stringRedisTemplate")
     private StringRedisTemplate stringRedisTemplate;
     @Resource
-    private FollowServiceImpl followService;
-    @Resource
     private UserServiceImpl userService;
 
     @Override
@@ -41,18 +40,7 @@ public class UserBlockServiceImpl extends ServiceImpl<UserBlockMapper, UserBlock
         this.save(userBlock);
         // 以用户id作为key缓存, value存储被该用户拉黑的用户数据
         String blockKey = RedisConstant.BLOCK_KEY_PREFIX + userId;
-        stringRedisTemplate.opsForZSet().add(blockKey, userBlock.toString(), System.currentTimeMillis());
-        // 判断用户是否关注该用户 -> 将用户关注该用户的数据删除
-        Follow follow = followService.query().eq("user_id", userId).eq("user_follow_id", userBlock).one();
-        if (follow != null) {
-            // 将缓存的关注数据删除
-            stringRedisTemplate.opsForZSet().remove(RedisConstant.FOLLOW_KEY_PREFIX + userBlock, userId);
-            // 将数据库中的关注数据删除
-            QueryWrapper<Follow> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("user_id", userId);
-            queryWrapper.eq("user_follow_id", userBlock);
-            followService.remove(queryWrapper);
-        }
+        stringRedisTemplate.opsForZSet().add(blockKey, userBlockId.toString(), System.currentTimeMillis());
         log.info("拉黑用户:{}成功", userBlockId);
         return Result.success();
     }
@@ -95,8 +83,8 @@ public class UserBlockServiceImpl extends ServiceImpl<UserBlockMapper, UserBlock
         // 有,返回所有拉黑用户数据
         List<Long> userBlockIdList = userBlockIdStrList.stream().map(Long::valueOf).toList();
         List<User> blockUserList = userService.query().in("id", userBlockIdList).list();
-        List<UserHolder> userHolderList = blockUserList.stream()
-                .map(blockUser -> BeanUtil.copyProperties(blockUser, UserHolder.class)).toList();
-        return Result.success(userHolderList);
+        List<UserInfo> userInfoList = blockUserList.stream()
+                .map(blockUser -> BeanUtil.copyProperties(blockUser, UserInfo.class)).toList();
+        return Result.success(userInfoList);
     }
 }

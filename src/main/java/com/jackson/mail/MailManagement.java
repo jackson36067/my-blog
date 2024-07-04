@@ -28,7 +28,6 @@ public class MailManagement {
         mailSender.send(simpleMailMessage);
     }
 
-    // TODO 对用户生日进行判断, 然后在他们生日当天8点发送邮件表示祝贺
 
     public void sendBirthdayCode(String to) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
