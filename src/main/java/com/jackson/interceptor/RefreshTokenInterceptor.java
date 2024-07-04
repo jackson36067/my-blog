@@ -36,6 +36,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
         }
         UserInfo userInfo = BeanUtil.fillBeanWithMap(userMap, new UserInfo(), false);
         UserHolder.setUser(userInfo);
+        // 刷新token过期时间
         redisTemplate.expire(tokenKey, RedisConstant.TOKEN_EXPIRE_TIME, TimeUnit.MINUTES);
         return true;
     }

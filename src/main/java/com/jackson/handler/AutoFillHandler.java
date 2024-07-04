@@ -20,18 +20,19 @@ public class AutoFillHandler implements MetaObjectHandler {
     public void insertFill(MetaObject metaObject) {
         this.strictInsertFill(metaObject, "create_time", LocalDateTime.class, LocalDateTime.now());
         this.strictInsertFill(metaObject, "update_time", LocalDateTime.class, LocalDateTime.now());
-        this.strictInsertFill(metaObject, "create_user", Long.class, EmployeeHolder.getEmployeeInfo().getId());
-        this.strictInsertFill(metaObject, "update_user", Long.class, EmployeeHolder.getEmployeeInfo().getId());
+        this.strictInsertFill(metaObject, "create_user", Long.class, EmployeeHolder.getEmployeeId());
+        this.strictInsertFill(metaObject, "update_user", Long.class, EmployeeHolder.getEmployeeId());
     }
 
     /**
      * 当实体类Employee进行了更新操作时,会自动执行该方法
+     *
      * @param metaObject 元对象
      */
 
     @Override
     public void updateFill(MetaObject metaObject) {
         this.strictInsertFill(metaObject, "update_time", LocalDateTime.class, LocalDateTime.now());
-        this.strictInsertFill(metaObject, "update_user", Long.class, EmployeeHolder.getEmployeeInfo().getId());
+        this.strictInsertFill(metaObject, "update_user", Long.class, EmployeeHolder.getEmployeeId());
     }
 }

@@ -1,19 +1,17 @@
 package com.jackson.utils;
 
-import com.jackson.dto.EmployeeInfo;
-
 public class EmployeeHolder {
-    private static final ThreadLocal<EmployeeInfo> THREAD_LOCAL = new ThreadLocal<>();
+    private static final ThreadLocal<Long> THREAD_LOCAL = new ThreadLocal<>();
 
-    public static void setEmployeeInfo(EmployeeInfo employeeInfo) {
-        THREAD_LOCAL.set(employeeInfo);
+    public static void setEmployeeId(Long empId) {
+        THREAD_LOCAL.set(empId);
     }
 
-    public static EmployeeInfo getEmployeeInfo() {
+    public static long getEmployeeId() {
         return THREAD_LOCAL.get();
     }
 
-    public static void removeEmployeeInfo() {
+    public static void removeEmployeeId() {
         THREAD_LOCAL.remove();
     }
 }

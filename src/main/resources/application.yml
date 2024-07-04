@@ -45,3 +45,10 @@ server:
   port: 8080
 mybatis-plus:
   type-aliases-package: com.jackson.pojo
+
+aliyun:
+  oss:
+    endpoint: https://oss-cn-beijing.aliyuncs.com
+    accessKeyId: LTAI5tGsAnD2SdWhum3TmjLz
+    accessKeySecret: DbMOfkNpmbMwLDfg7Oq0DfNLX6uLxV
+    bucketName: jackso
