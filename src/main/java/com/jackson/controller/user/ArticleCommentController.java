@@ -1,4 +1,4 @@
-package com.jackson.controller;
+package com.jackson.controller.user;
 
 import com.jackson.entity.Result;
 import com.jackson.service.ArticleCommentService;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/my-blog")
+@RequestMapping("/user/my-blog")
 public class ArticleCommentController {
 
     @Resource

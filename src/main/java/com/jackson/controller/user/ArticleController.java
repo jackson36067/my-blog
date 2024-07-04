@@ -1,4 +1,4 @@
-package com.jackson.controller;
+package com.jackson.controller.user;
 
 import com.jackson.dto.ArticleDTO;
 import com.jackson.entity.Result;
@@ -7,7 +7,7 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/my-blog/article/")
+@RequestMapping("/user/my-blog/article/")
 public class ArticleController {
 
     @Resource

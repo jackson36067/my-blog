@@ -1,4 +1,4 @@
-package com.jackson.controller;
+package com.jackson.controller.user;
 
 import com.jackson.dto.UserCodeDTO;
 import com.jackson.dto.UserInfo;

@@ -1,4 +1,4 @@
-package com.jackson.controller;
+package com.jackson.controller.user;
 
 import com.jackson.entity.Result;
 import com.jackson.service.ArticleReportService;

@@ -1,4 +1,4 @@
-package com.jackson.controller;
+package com.jackson.controller.user;
 
 import com.jackson.entity.Result;
 import com.jackson.service.FollowService;
@@ -6,7 +6,7 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/my-blog")
+@RequestMapping("/user/my-blog")
 public class FollowController {
     @Resource
     private FollowService followService;
