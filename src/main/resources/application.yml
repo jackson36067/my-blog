@@ -48,7 +48,7 @@ mybatis-plus:
 
 aliyun:
   oss:
-    endpoint: https://oss-cn-beijing.aliyuncs.com
-    accessKeyId: LTAI5tGsAnD2SdWhum3TmjLz
-    accessKeySecret: DbMOfkNpmbMwLDfg7Oq0DfNLX6uLxV
-    bucketName: jackso
+    endpoint: yourEndpoint
+    accessKeyId: yourAccessKeyId
+    accessKeySecret: yourAccessKeySercret
+    bucketName: yourBuckeetName
