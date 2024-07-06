@@ -23,7 +23,8 @@ public class Employee {
     private String phone;
     private String sex;
     private String idNumber;
-    private String status;
+    private String status; // 账号状态
+    private String authority; // 权限等级
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     @TableField(fill = FieldFill.INSERT_UPDATE)
