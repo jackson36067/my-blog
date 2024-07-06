@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 @Component
@@ -35,7 +36,10 @@ public class BirthdayTask {
                 .toList()
                 .forEach(userInfo -> {
                     // 拿现在的日期与用户生日日期对比
-                    if (LocalDate.now().equals(userInfo.getBirthday())) {
+                    // 将时间转换为MM-dd形式进行比较
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd");
+                    // 将该用户生日的MM-dd与今天的日期MM-dd做对比
+                    if (LocalDate.now().format(dateTimeFormatter).equals(userInfo.getBirthday().format(dateTimeFormatter))) {
                         mailManagement.sendBirthdayCode(userInfo.getEmail());
                     }
                 });
